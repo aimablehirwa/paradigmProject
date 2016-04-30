@@ -3,7 +3,7 @@
 class ContextManager
   
   def initialize()
-    @directory = Hashes.new#todo
+    @directory = Hash.new
   end
   
   def directory()
@@ -14,14 +14,17 @@ class ContextManager
     @directory = aDictionary
   end
   
-  def discardContext(aConctext)
+  # suppression d'un context
+  def discardContext(aContext)
+    # lancer exception si le context n'a pas de manager
     if aContext.manager != self
-      #todo
+      raise 'Attempt to discard foreign context.'
     end
     if aContext.isActive
-      #todo
+      raise 'Attempt to discard active context.'
     end
-    #todo
+    # si la cle n'est pas presente alors rien n'est fait
+    @dictionary.delete(aContext)
   end
   
 end
