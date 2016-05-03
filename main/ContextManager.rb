@@ -3,19 +3,20 @@
 class ContextManager
   
   def initialize()
-    @directory = Hash.new
+    @dictionary = Hash.new(nil)
   end
   
-  def directory()
+  def dictionary()
     return @dictionary
   end
   
-  def directory=(aDictionary)
-    @directory = aDictionary
+  def dictionary=(aDictionary)
+    @dictionary = aDictionary
   end
   
   # suppression d'un context
   def discardContext(aContext)
+    test = Hash.new
     # lancer exception si le context n'a pas de manager
     if aContext.manager != self
       raise 'Attempt to discard foreign context.'

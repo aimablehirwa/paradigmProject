@@ -1,7 +1,7 @@
 
 #$LOAD_PATH << '.' #to make Ruby aware that included files must be searched in the current directory.
 require "set"
-require "contextManager"
+require_relative "contextManager.rb"
 
 class Context
   
@@ -13,9 +13,8 @@ class Context
    
    # activation du context, incremenation du conteur d'activation + 1 pour le mettre actif
    def active()
-     if @activationCount == 0
-      self.activationCount= @activationCount + 1
-     end
+     self.activationCount= @activationCount + 1
+     return self
    end
    
    def activationCount()
@@ -27,23 +26,24 @@ class Context
    end
    
    def deactivate()
-     if @activationCount != 0
+     if @activationCount > 0
        self.activationCount= @activationCount -1
      end
+     return self
    end
    
    # suppression du context dans le manager
    # le context demande au manager de le supprimer
    def discard()
-     self.manager.discardContext(this)
-     if self == Context.default
-       Context.default= nil
-     end
+       self.manager.discardContext(self)
+       if self == Context.default
+         Context.default= nil
+       end
    end
    
    # activation du context en incrementant le conteur d'activation
    def isActive()
-     return @activationCount > 1
+     return @activationCount > 0
    end
    
    # getter du manager
@@ -54,12 +54,12 @@ class Context
        if self == Context.default
          # si self est le context par defaut alors cree un nouveau manager
          # definir le nom de self aupres du manager comme etant le default
-         self.manager= ContextManager.new
+         @manager = ContextManager.new
          self.name= "default"
        else
          # si self n'est pas context par defaut
-         # definir le manager le manager comme etant le manager par defaut
-         self.manager= Context.default.manager
+         # definir le manager comme etant le manager par defaut
+         @manager = Context.default.manager
        end
      end
      return @manager
@@ -72,23 +72,29 @@ class Context
    
    
    def name()
-     return @manager.dictionary[:self]
+     return self.manager.dictionary[self]
    end
    
    # setter du nom de self
    def name=(aString)
      if aString == nil
-       # si le nom en param est nil alors supprimer le context du manager
-       # si il y est non, rien faire
-       @manager.dictionary.delete(self)  
+       # si le nom en param est nil alors supprimer le context du manager si il y est sinon rien faire
+       self.manager.dictionary.delete(self)  
      else
        # si le nom n'est pas nil alors ajouter self au manager
-       @manager.dictionary[:self] = aString 
+       self.manager.dictionary[self] = aString 
      end 
+     return self
    end
    
-   def printOn(aStream)
-     #TODO
+   def printOn()
+     _s = ""
+     if self.name == nil
+       _s = "anonymous context"
+     else
+       _s = self.name + " context"
+     end 
+     return _s
    end
    
    # creation de methodes singleton pour la gestion du context par defaut
@@ -108,8 +114,10 @@ class Context
        @default = aContext
      end
    
-     def named=(aString)
-       return self.new.name= aString
+     def named(aString)
+       _ctx = self.new
+       _ctx.name= aString
+       return _ctx
      end
      
    end
