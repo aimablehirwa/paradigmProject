@@ -38,7 +38,7 @@ class TestContext < Test::Unit::TestCase
   def testConflictingActivation
     #"This adaptation is known to work from previous tests."
     quietContext.adaptationClass(Phone,"advertise","advertiseQuietly")
-    assert_nothing_raised(RuntimeError){quietContext.adaptationClass(Phone, "advertise", "advertiseQuietly")}
+    assert_nothing_raised(RuntimeError){offHookContext.adaptationClass(Phone, "advertise", "advertiseQuietly")}
 
     assert(!quietContext.isActive,"In normal conditions, the quiet context should be inactive")
     assert_nothing_raised(RuntimeError) {quietContext.active} 
