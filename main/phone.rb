@@ -19,8 +19,10 @@ class Phone
     @activeCall = aPhoneCall
   end
   
-  def advertise(aPhoneCall)
-    return "ringtone"
+  class << self
+    def advertise()
+      return proc {"ringtone"}
+    end
   end
   
   # repondre au premier appel dans la file si il y en a un
@@ -103,7 +105,7 @@ class Phone
   
   def receive(aPhoneCall)
     @incomingCalls.add?(aPhoneCall)
-    self.advertise
+    Phone.advertise
   end
   
   # recuperation d'un appel suspendu, il doit etre dans le ongoingcalls

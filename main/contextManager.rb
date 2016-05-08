@@ -6,16 +6,19 @@ class ContextManager
   
   
   def initialize()
-    super.initialize
     @dictionary = Hash.new(nil)
     @activeAdaptations = Set.new
   end
   
   
   def activateAdaptation(aContextAdaptation)
-    adapt = self.activeAdaptations.select?{|adaptation| adaptation.sameTarget(aContextAdaptation) && adaptation.context != Context.default}
-    if adapt != nil
-      raise "Conflicting adaptation for "#{aContextAdaptation.adaptedClass.printString} >> #{aContextAdaptation.adaptedSelector.printString}"
+    adapt = false
+    self.activeAdaptations.each do |adaptation| 
+      adapt = (adaptation.sameTarget(aContextAdaptation) && adaptation.context != Context.default)
+    end
+    #throw :cannotActiveAdaptation 
+    if adapt == true
+      raise "Conflicting adaptation for #{aContextAdaptation.adaptedClass.name} >> #{aContextAdaptation.adaptedSelector}"
     end
     
     self.activeAdaptations.add(aContextAdaptation)
@@ -27,7 +30,7 @@ class ContextManager
     return @activeAdaptations
   end
   
-  def activeAdaptations(aCollection)
+  def activeAdaptations=(aCollection)
     @activeAdaptations = aCollection
   end
   
@@ -45,19 +48,21 @@ class ContextManager
   end
   
   def deactivateAdaptation(aContextAdaptation)
-    if self.activeAdaptations.delete?(aContextAdaptation)
+    if self.activeAdaptations.delete?(aContextAdaptation) == nil
       raise "Attempt to deactivate unmanaged adaptation."
     end
-    
-    defaultAdaptation = Context.default.adaptations.select?{
-            |adaptation| adaptation.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
-    }
+
+    defaultAdaptation = nil
+    Context.default.adaptations.each do |adaptation| 
+      if adaptation.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
+        defaultAdaptation = adaptation
+      end
+    end
+
     if defaultAdaptation == nil
       raise "Could not find default behaviour for removed adaptation."
     end
     defaultAdaptation.deploy
-    #TODO
-     
   end
   
   # suppression d'un context
@@ -77,7 +82,7 @@ class ContextManager
   
   def printOn
     activeAdaptationCount = self.activeAdaptations.size
-    puts "#{self.class.name} (#{activeAdaptationCount.asString} #{active.adaptation})"
+    puts "#{self.class.name} #{activeAdaptationCount.asString}"
   end
   
 end

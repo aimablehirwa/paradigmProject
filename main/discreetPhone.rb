@@ -1,13 +1,14 @@
 
 
-class DiscretePhone < Phone
+class DiscreetPhone < Phone
   
-  def advertiseDiscreteBeep(aPhoneCall)
-    return "discrete beep"
-  end
+  class << self
+    def advertiseDiscreteBeep()
+      return proc {"discrete beep"}
+    end
   
-  def advertiseQuietly(aPhoneCall)
-    return "vibrator"
+    def advertiseQuietly()
+      return proc {"vibrator"}
+    end
   end
-    
 end

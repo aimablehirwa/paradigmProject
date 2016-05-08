@@ -2,7 +2,9 @@
 
 class MulticallPhone < Phone
   
-  def advertiseWaitingCall(aPhoneCall)
-    return "call waiting signal"
+  class << self
+    def advertiseWaitingCall()
+      return proc {"call waiting signal"}
+    end
   end
 end
