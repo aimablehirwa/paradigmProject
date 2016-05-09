@@ -41,7 +41,7 @@ class TestContext < Test::Unit::TestCase
     Context.default.deactivate
     assert(!Context.default.isActive, "The default context should be inactive")
     assert_nothing_raised(RuntimeError){Context.default.discard}
-    #assert_nothing_raised(RuntimeError){self.testDefaultContext}
+    assert_nothing_raised(RuntimeError){self.testDefaultContext}
     assert(!(Context.default == _previousDefault), "Fresh default context should not be the default context just discarded")
   end
   

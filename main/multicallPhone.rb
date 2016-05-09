@@ -7,4 +7,5 @@ class MulticallPhone < Phone
       return proc {"call waiting signal"}
     end
   end
+  
 end

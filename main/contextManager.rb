@@ -10,7 +10,6 @@ class ContextManager
     @activeAdaptations = Set.new
   end
   
-  
   def activateAdaptation(aContextAdaptation)
     adapt = false
     self.activeAdaptations.each do |adaptation| 
@@ -23,7 +22,6 @@ class ContextManager
     
     self.activeAdaptations.add(aContextAdaptation)
     aContextAdaptation.deploy
-    #TODO
   end
   
   def activeAdaptations

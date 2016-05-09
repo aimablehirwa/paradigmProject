@@ -11,4 +11,5 @@ class DiscreetPhone < Phone
       return proc {"vibrator"}
     end
   end
+  
 end

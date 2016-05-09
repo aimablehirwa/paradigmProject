@@ -26,7 +26,7 @@ class Context
    def activateAdaptations
       self.adaptations.each do |adaptation|
         self.manager.activateAdaptation(adaptation)
-        #TODO
+        #TODO attraper l'exception et ...
       end
    end
    
@@ -107,6 +107,9 @@ class Context
      if self.isActive
        self.manager.activateAdaptation(aContextAdaptation)
      end
+     if aContextAdaptation.adaptedImplementation != nil
+       #TODO
+     end
    end 
    
    
@@ -135,7 +138,7 @@ class Context
        if self == Context.default
          Context.default= nil
        end
-       copy = self.adaptations.initialize_clone
+       copy = self.adaptations.clone
        copy.each do |adaptation | 
          self.removeExistingAdaptation(adaptation)
        end
@@ -189,7 +192,6 @@ class Context
    end
    
    def printOn()
-     _s = ""
      if self.name == nil
        _s = "anonymous context"
      else
@@ -208,6 +210,10 @@ class Context
      end
      if self.adaptations.delete?(aContextAdaptation) == nil 
        raise "Inconsistent context state."
+     end
+     aBlock = proc {}
+     if aContextAdaptation.adaptedImplementation != nil
+       #TODO
      end
    end
    

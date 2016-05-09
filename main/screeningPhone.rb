@@ -3,8 +3,9 @@
 class ScreeningPhone
   
   class << self
-    def advertiseWithScreening(aPhoneCall)
-      return proc {"#{thisContext.proceed} with screening"}
+    def advertiseWithScreening
+      return proc {"#{self.proceed(__method__)} with screening"}
     end
+    
   end
 end

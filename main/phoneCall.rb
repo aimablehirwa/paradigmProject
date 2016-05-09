@@ -2,7 +2,6 @@
 
 class PhoneCall
   
-  
   def from
     return @from  
   end

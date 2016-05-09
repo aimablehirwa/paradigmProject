@@ -28,7 +28,6 @@ class TestContext < Test::Unit::TestCase
     #Context.default.discard
 
     #super.tearDown
-   
   end
   
   def testAdaptationAPI

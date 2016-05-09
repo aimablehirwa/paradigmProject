@@ -23,6 +23,16 @@ class Phone
     def advertise()
       return proc {"ringtone"}
     end
+    
+    def proceed(aSelector)
+      case aSelector
+      when :advertise
+        return "ringtone"
+      else
+        return "No advertisement method found."
+      end
+    end
+    
   end
   
   # repondre au premier appel dans la file si il y en a un
