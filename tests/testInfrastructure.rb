@@ -8,15 +8,6 @@ class TestContext < Test::Unit::TestCase
   # The tests are automatically run #
   ###################################
   
-  #Running
-  def setup
-    Context.default= nil
-  end
-
-  def teardown
-    ## Nothing really
-  end
-  
   #TEST 0 : Protocol
   def testContextProtocol
     _context = Context.new
@@ -116,6 +107,20 @@ class TestContext < Test::Unit::TestCase
     assert_nothing_raised(RuntimeError){Context.default.discard}
     assert_nothing_raised(RuntimeError){self.testDefaultContext}
     assert(!(Context.default == _previousDefault), "Fresh default context should not be the default context just discarded")
+  end
+  
+  #Private 
+  def resetDefaultContext
+    assert((defined?Context && Context.kind_of?(Class)) || (Context.method_defined?(:default) || Context.default == nil))
+  end
+  
+  #Running
+  def setup
+    Context.default= nil
+  end
+
+  def teardown
+    assert(resetDefaultContext)
   end
   
 end
