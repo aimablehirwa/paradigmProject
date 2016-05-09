@@ -6,6 +6,10 @@ require_relative "contextAdaptation.rb"
 
 class Context
   
+   ##################
+   # Initialization #
+   ##################
+   
    def initialize()
      @activationCount = 0 
      @adaptations = Set.new # use add to put an object
@@ -13,142 +17,9 @@ class Context
      @adaptations = Set.new 
    end
    
-   # activation du context, incrementation du conteur d'activation + 1 pour le mettre actif
-   def activate()
-     if self.activationCount == 0
-       # on demande a active l'activer les adaptations du context
-       self.activateAdaptations
-     end
-     self.activationCount= @activationCount + 1
-     return self
-   end
-   
-   def activateAdaptations
-      self.adaptations.each do |adaptation|
-        self.manager.activateAdaptation(adaptation)
-        #TODO attraper l'exception et ...
-      end
-   end
-   
-   def activationCount()
-     return @activationCount
-   end
-   
-   def activationCount=(anInteger)
-     @activationCount = anInteger
-   end
-   
-   # la methode recoit des noms en paramettres
-   def adaptationClass(aClass, aSelector, aMethod)
-      
-     if aClass.methods.grep(/#{aSelector}/) == []
-       raise "Cannot adapt inexistent method  #{aSelector} in  #{aClass.class.name}."   
-     else
-       _currentMethod = aClass.send(aSelector.to_sym)
-     end
-
-     ifOverridding = proc {"preserve"}
-     _defaultAdaptation = ContextAdaptation.createAdaptation(Context.default, aClass, aSelector, _currentMethod) 
-     Context.default.addAdaptationOverrid(_defaultAdaptation, ifOverridding)
-     
-     _contextAdaptation = ContextAdaptation.createAdaptation(self, aClass, aSelector, aMethod)
-     self.addAdaptation(_contextAdaptation)
-     return self
-     
-   end
-   
-   
-   def adaptations
-     @adaptations
-   end
-   
-   
-   def adaptations=(set)
-     @adaptations = set  
-   end
-   
-   
-   def addAdaptation(aContextAdaptation)
-     ifOverridding = proc {"overwrite"}
-     self.addAdaptationOverrid(aContextAdaptation, ifOverridding)
-   end
-   
-   
-   def addAdaptationOverrid(aContextAdaptation, aBlock)
-     existingAdaptation = nil
-     self.adaptations.each do |adaptation| 
-       # le meme context ne peut pas avoir deux adaptations differentes du meme selector
-       if adaptation.sameTarget(aContextAdaptation)
-         existingAdaptation = adaptation
-       end
-     end
-     if existingAdaptation == nil
-       existingAdaptation = aContextAdaptation
-       self.addInexistentAdaptation(aContextAdaptation)
-     end
-     
-     action = aBlock.call
-     if action != "preserve"
-       if action == "overwrite"
-         self.removeExistingAdaptation(existingAdaptation)
-         self.addInexistentAdaptation(aContextAdaptation)
-       else
-         raise "Unknown overridding action  #{action}."
-       end
-     end
-   end
-   
-   
-   def addInexistentAdaptation(aContextAdaptation)
-     if self != aContextAdaptation.context
-       raise "Attempt to add foreign adaptation."
-     end
-     self.adaptations.add(aContextAdaptation)
-     if self.isActive
-       self.manager.activateAdaptation(aContextAdaptation)
-     end
-     if aContextAdaptation.adaptedImplementation != nil
-       #TODO
-     end
-   end 
-   
-   
-   def deactivate()
-     if @activationCount == 1
-       self.deactivateAdaptations
-     end
-     if @activationCount > 0
-       self.activationCount = @activationCount -1
-     end
-     return self
-   end
-   
-   
-   def deactivateAdaptations
-     self.adaptations.each do |adaptation|
-       self.manager.deactivateAdaptation(adaptation)
-     end
-   end
-   
-   
-   # suppression du context dans le manager
-   # le context demande au manager de le supprimer
-   def discard()
-       self.manager.discardContext(self)
-       if self == Context.default
-         Context.default= nil
-       end
-       copy = self.adaptations.clone
-       copy.each do |adaptation | 
-         self.removeExistingAdaptation(adaptation)
-       end
-   end
-   
-   
-   # activation du context en incrementant le conteur d'activation
-   def isActive()
-     return @activationCount > 0
-   end
+   #############
+   # Accessing #
+   #############
    
    # getter du manager
    def manager()
@@ -174,7 +45,7 @@ class Context
      @manager = aContextManager
    end
    
-   
+   # getter du manager
    def name()
      return self.manager.dictionary[self]
    end
@@ -191,6 +62,82 @@ class Context
      return self
    end
    
+   ##############
+   # Activation #
+   ##############
+   
+   # activation du context, incrementation du conteur d'activation + 1 pour le mettre actif
+   def activate()
+     if self.activationCount == 0
+       # on demande a active l'activer les adaptations du context
+       self.activateAdaptations
+     end
+     self.activationCount= @activationCount + 1
+     return self
+   end
+   
+   def activationAge()
+   end
+   
+   def deactivate()
+     if @activationCount == 1
+       self.deactivateAdaptations
+     end
+     if @activationCount > 0
+       self.activationCount = @activationCount -1
+     end
+     return self
+   end
+   
+   # activation du context en incrementant le conteur d'activation
+   def isActive()
+     return @activationCount > 0
+   end
+   
+   ##############
+   # Adaptation #
+   ##############
+   
+   # la methode recoit des noms en paramettres
+   def adaptClass(aClass, aSelector, aMethod)
+      
+     if aClass.methods.grep(/#{aSelector}/) == []
+       raise "Cannot adapt inexistent method  #{aSelector} in  #{aClass.class.name}."   
+     else
+       _currentMethod = aClass.send(aSelector.to_sym)
+     end
+
+     ifOverridding = proc {"preserve"}
+     _defaultAdaptation = ContextAdaptation.createAdaptation(Context.default, aClass, aSelector, _currentMethod) 
+     Context.default.addAdaptationOverrid(_defaultAdaptation, ifOverridding)
+     
+     _contextAdaptation = ContextAdaptation.createAdaptation(self, aClass, aSelector, aMethod)
+     self.addAdaptation(_contextAdaptation)
+     return self
+     
+   end
+   
+   ##############
+   # Life cycle #
+   ##############
+   
+   # suppression du context dans le manager
+   # le context demande au manager de le supprimer
+   def discard()
+       self.manager.discardContext(self)
+       if self == Context.default
+         Context.default= nil
+       end
+       copy = self.adaptations.clone
+       copy.each do |adaptation | 
+         self.removeExistingAdaptation(adaptation)
+       end
+   end
+   
+   ############
+   # Printing #
+   ############
+   
    def printOn()
      if self.name == nil
        _s = "anonymous context"
@@ -200,6 +147,85 @@ class Context
      return _s
    end
    
+   ###########
+   # Private #
+   ###########
+   
+   def activateAdaptations
+      self.adaptations.each do |adaptation|
+        self.manager.activateAdaptation(adaptation)
+        #TODO attraper l'exception et ...
+      end
+   end
+   
+   def activationCount()
+     return @activationCount
+   end
+   
+   def activationCount=(anInteger)
+     @activationCount = anInteger
+   end
+   
+   def adaptations
+     @adaptations
+   end
+   
+   def adaptations=(set)
+     @adaptations = set  
+   end
+   
+   
+   def addAdaptation(aContextAdaptation)
+     ifOverridding = proc {"overwrite"}
+     self.addAdaptationOverrid(aContextAdaptation, ifOverridding)
+   end
+      
+   def addAdaptationOverrid(aContextAdaptation, aBlock)
+     existingAdaptation = nil
+     self.adaptations.each do |adaptation| 
+       # le meme context ne peut pas avoir deux adaptations differentes du meme selector
+       if adaptation.sameTarget(aContextAdaptation)
+         existingAdaptation = adaptation
+       end
+     end
+     if existingAdaptation == nil
+       existingAdaptation = aContextAdaptation
+       self.addInexistentAdaptation(aContextAdaptation)
+     end
+     
+     action = aBlock.call
+     if action != "preserve"
+       if action == "overwrite"
+         self.removeExistingAdaptation(existingAdaptation)
+         self.addInexistentAdaptation(aContextAdaptation)
+       else
+         raise "Unknown overridding action  #{action}."
+       end
+     end
+   end  
+   
+   def addInexistentAdaptation(aContextAdaptation)
+     if self != aContextAdaptation.context
+       raise "Attempt to add foreign adaptation."
+     end
+     self.adaptations.add(aContextAdaptation)
+     if self.isActive
+       self.manager.activateAdaptation(aContextAdaptation)
+     end
+     if aContextAdaptation.adaptedImplementation != nil
+       #TODO
+     end
+   end 
+     
+   def deactivateAdaptations
+     self.adaptations.each do |adaptation|
+       self.manager.deactivateAdaptation(adaptation)
+     end
+   end
+   
+   def manager(aContextManager)
+     #TODO
+   end
    
    def removeExistingAdaptation(aContextAdaptation)
      if self != aContextAdaptation.context 
