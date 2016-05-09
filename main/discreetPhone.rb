@@ -2,6 +2,10 @@
 
 class DiscreetPhone < Phone
   
+  #################
+  # Call handling #
+  #################
+  
   class << self
     def advertiseDiscreteBeep()
       return proc {"discrete beep"}

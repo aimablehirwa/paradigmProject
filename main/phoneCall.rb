@@ -2,6 +2,10 @@
 
 class PhoneCall
   
+  #############
+  # Accessing #
+  #############
+  
   def from
     return @from  
   end
@@ -9,6 +13,10 @@ class PhoneCall
   def from=(aString)
     @from = aString
   end
+  
+  ############
+  # Printing #
+  ############
   
   def printOn(aStream)
     #TODO

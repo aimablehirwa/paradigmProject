@@ -40,11 +40,6 @@ class Context
      return @manager
    end
    
-   # setter du manager
-   def manager=(aContextManager)
-     @manager = aContextManager
-   end
-   
    # getter du manager
    def name()
      return self.manager.dictionary[self]
@@ -223,8 +218,9 @@ class Context
      end
    end
    
-   def manager(aContextManager)
-     #TODO
+   # setter du manager
+   def manager=(aContextManager)
+     @manager = aContextManager
    end
    
    def removeExistingAdaptation(aContextAdaptation)

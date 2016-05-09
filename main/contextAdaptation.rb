@@ -3,6 +3,9 @@ require_relative "phone"
 
 class ContextAdaptation
   
+  ##################
+  # Initialization #
+  ##################
   
   def initialize
     @adaptedClass = nil
@@ -11,12 +14,9 @@ class ContextAdaptation
     @context = nil
   end
   
-  def equals(aContextAdaptation)
-    return ((self.context == aContextAdaptation.context) && 
-      (self.adaptedClass == aContextAdaptation.adaptedClass) && 
-      (self.adaptedSelector == aContextAdaptation.adaptedSelector)  && 
-      (self.adaptedImplementation == aContextAdaptation.adaptedImplementation)) 
-  end
+  #############
+  # Accessing #
+  #############
   
   def adaptedClass
     return @adaptedClass
@@ -54,20 +54,42 @@ class ContextAdaptation
     @context = aContext
   end
   
+  ################
+  # Installation #
+  ################
+  
   def deploy
    #"Install adapted method implementation.
    #(avoid #basicAddSelector:withMethod:, because it changes the class and selector of the method passed as argument."
     symbol = self.adaptedSelector.to_sym
-    Phone.define_singleton_method(symbol, self.adaptedImplementation) 
-    
+    Phone.define_singleton_method(symbol, self.adaptedImplementation)    
   end
+  
+  ############
+  # Printing #
+  ############
   
   def printOn
     puts "context >> #{context.printOn} : class >> #{self.adaptedClass} : selector >> #{self.adaptedSelector} : method >> #{self.adaptedImplementation}"
   end
   
+  ###########
+  # Testing #
+  ###########
+  
+  def adaptsClass(aClass, aSymbol)
+    #TODO
+  end
+  
   def sameTarget(aContextAdaptation)
     return self.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
+  end
+  
+  def equals(aContextAdaptation)
+    return ((self.context == aContextAdaptation.context) && 
+      (self.adaptedClass == aContextAdaptation.adaptedClass) && 
+      (self.adaptedSelector == aContextAdaptation.adaptedSelector)  && 
+      (self.adaptedImplementation == aContextAdaptation.adaptedImplementation)) 
   end
   
   class << self
