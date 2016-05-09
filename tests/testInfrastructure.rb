@@ -39,7 +39,7 @@ class TestContext < Test::Unit::TestCase
   def testActivation
     _context = Context.new #Fresh instance
     assert(!_context.isActive, "Context must be inactive.")
-    assert(_context.active == _context, "Activate function should return self")
+    assert(_context.activate == _context, "Activate function should return self")
     assert(_context.isActive, "Activation should leave the context in an active state")
     assert(_context.deactivate == _context, "Deactivate function should return self")
     assert(!_context.isActive, "Deactivation should leave the context in an inactive state")
@@ -48,7 +48,7 @@ class TestContext < Test::Unit::TestCase
   def testRedundantActivation
     _context = Context.new
     assert(!_context.isActive, "Newly created contexts should be initially inactive")
-    10.times do _context.active  end
+    10.times do _context.activate  end
     assert(_context.isActive, "The context must be active 10 times")
     9.times do _context.deactivate end
     assert(_context.isActive, "Context should stay active for fewer deactivations than activations")
@@ -60,12 +60,12 @@ class TestContext < Test::Unit::TestCase
   def testRedundantDeactivation
     _context = Context.new
     assert(!_context.isActive, "Newly created contexts should be initially inactive")
-    3.times do _context.active end
+    3.times do _context.activate end
     assert(_context.isActive)
     9.times do _context.deactivate end
     assert(!_context.isActive, "The context should be inactivate")
     
-    _context.active
+    _context.activate
     assert(_context.isActive, "Deactivation does not accumulate once the context is already inactive")
   
     _context.deactivate

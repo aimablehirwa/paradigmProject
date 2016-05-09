@@ -14,7 +14,7 @@ class Context
    end
    
    # activation du context, incrementation du conteur d'activation + 1 pour le mettre actif
-   def active()
+   def activate()
      if self.activationCount == 0
        # on demande a active l'activer les adaptations du context
        self.activateAdaptations
@@ -236,7 +236,7 @@ class Context
      def default()
        if @default == nil
          @default = self.new
-         @default.active
+         @default.activate
        end
        return @default
      end
