@@ -10,7 +10,6 @@ class TestContext < Test::Unit::TestCase
   
   #TEST 0 : Protocol
   def testContextProtocol
-    _context = Context.new
     assert(defined?Context, "The Context should exist")
     assert(Context.kind_of?(Class), "Context should be a class")
     assert(Context.method_defined?(:activate), "Context activation method should exist")

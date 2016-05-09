@@ -7,17 +7,18 @@ require "test/unit"
 
 class TestContext < Test::Unit::TestCase
   
-  def setUp
-    #"Adapt #advertise: for situations in which call screening is active."
-  end
-
-  def teardown
-    # nothing to do   
+  ###################################
+  # The tests are automatically run #
+  ###################################
+  
+  #TEST 1 : Composition
+  def testInvalidProceed
+    #TODO
   end
 
   def testNestedActivation
     @screeningContext = Context.named("screening")
-    @screeningContext.adaptationClass(Phone, "advertise", ScreeningPhone.advertiseWithScreening) 
+    @screeningContext.adaptClass(Phone, "advertise", ScreeningPhone.advertiseWithScreening) 
     
     phone = Phone.new
     call = PhoneCall.new
@@ -26,11 +27,20 @@ class TestContext < Test::Unit::TestCase
     #puts "#{phone.class.advertise.call}"
     assert(phone.class.advertise == "ringtone", "Call should be advertised with default ringtone")
   
-    @screeningContext.active
+    @screeningContext.activate
     assert(phone.class.advertise == "ringtone with screening", "Screening information should be overlaid over the default ringtone advertisement")
     
     @screeningContext.deactivate
     assert(phone.class.advertise == "ringtone", "Call advertisement should have been reverted to default")
+  end
+  
+  #Running
+  def setUp
+    #"Adapt #advertise: for situations in which call screening is active."
+  end
+
+  def teardown
+    # nothing to do   
   end
 
 end
