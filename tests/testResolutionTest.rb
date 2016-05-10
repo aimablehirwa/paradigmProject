@@ -27,7 +27,7 @@ class TestContext < Test::Unit::TestCase
     @quietContext.deactivate
   end
 
-  #TEST 3 : Context age
+  #TEST 2 : Context age
   def testContextAge
     @quietContext = Context.named("quiet")
     @screeningContext = Context.named("screening")
@@ -48,7 +48,7 @@ class TestContext < Test::Unit::TestCase
     @screeningContext.deactivate
   end
   
-  #TEST 4 : Composition
+  #TEST 3 : Composition
   def testInterleavedActivation
     phone = Phone.new
     call = PhoneCall.new
