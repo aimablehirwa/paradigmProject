@@ -9,6 +9,7 @@ class ContextManager
   def initialize()
     @dictionary = Hash.new(nil)
     @activeAdaptations = Set.new
+    @totalActivations = 0
   end
   
   #############
@@ -41,7 +42,7 @@ class ContextManager
   ##############
   
   def contextActivationAge(aContext)
-    #TODO
+    return @totalActivations - aContext.activationCount  
   end
   
   def signalActivationRequest(aContext)

@@ -30,7 +30,7 @@ class TestContext < Test::Unit::TestCase
     # The adaptation completely overrides the original behaviour."
     phone = Phone.new
     call = PhoneCall.new 
-    call.from= "Bob"
+    call.from = "Bob"
     phone.receive(call)
     assert(phone.class.advertise == "ringtone", "A phone should play a ringtone by default")
     

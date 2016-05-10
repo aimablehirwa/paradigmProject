@@ -72,6 +72,7 @@ class Context
    end
    
    def activationAge()
+     return self.manager.contextActivationAge(self)
    end
    
    def deactivate()
