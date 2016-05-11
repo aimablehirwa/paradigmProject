@@ -1,4 +1,5 @@
 require "set"
+require_relative "contextAdaptation.rb"
 
 class ContextManager
   
@@ -9,7 +10,9 @@ class ContextManager
   def initialize()
     @dictionary = Hash.new(nil)
     @activeAdaptations = Set.new
+    @resolutionPolicy = self.defaultResolutionPolicy
     @totalActivations = 0
+    @activationStamps = Hash.new(0)
   end
   
   #############
@@ -30,11 +33,22 @@ class ContextManager
   end
   
   def resolutionPlolicy()
-    #TODO
+    return @resolutionPolicy
   end
   
-  def resolutionPlolicy(aBlock)
-    #TODO
+  #to check
+  def resolutionPolicy(aBlock)
+    
+    resolutionPolicy = aBlock
+    adaptedTarget = Set.new
+    
+    @activeAdaptations.each do |adaptation| 
+      adaptedTarget.add(adaptation.adaptedClass, adaptation.adaptedSelector)
+    end
+    
+    adaptedTarget.each do |target|
+      self.deployBestAdaptationForClass(target[1], target[2])
+    end
   end
   
   ##############
@@ -42,15 +56,18 @@ class ContextManager
   ##############
   
   def contextActivationAge(aContext)
-    return @totalActivations - aContext.activationCount  
+    #return 0 sinon
+    return @totalActivations - @activationStamps[aContext]  
   end
   
+  #to check
   def signalActivationRequest(aContext)
-    #TODO
+    @totalActivations = @totalActivations + 1
+    @activationStamps[aContext] = @totalActivations
   end
   
   def signalDeactivationRequest(aContext)
-    #TODO
+    #This callback is invoked whenever a context becomes inactive
   end
   
   ##############
@@ -72,7 +89,11 @@ class ContextManager
   end
   
   def adaptationChainForClass(aClass, aSymbol)
-    #TODO
+    relevantAdaptations = self.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.adaptClass(aClass, aSymbol)}
+    if(relevantAdaptations.empty)
+      raise "No adaptations found for " + aClass.to_s + ">>" + aSymbol.to_s
+    end   
+    return relevantAdaptation.sorted(self.resolutionPlicy)
   end
   
   def deactivateAdaptation(aContextAdaptation)
@@ -94,7 +115,7 @@ class ContextManager
   end
   
   def deployBestAdaptationForClass(aClass, aSymbol)
-    #TODO
+    self.adaptationChainForClass(aClass, aSymbol).first.deploy
   end
   
   ##############
@@ -141,22 +162,44 @@ class ContextManager
   ##############
   
   def ageResolutionPolicy()
-    #TODO
-  end
+    return self.contextActivationAge(adaptation1.context) < self.contextActivationAge(adaptation2.context)
+  end 
   
   def defaultResolutionPolicy()
-    #TODO
+    return self.singleAdaptationResolutionPolicy
   end
   
   def findNextMethodForClass(aClass, aSymbol, aMethod)
-    #TODO
+    applicableMethods = self.adaptationChainForClass(aClass, aSymbol).initialize_clone.keep_if{|adaptation| adaptation.adaptedImplementation}
+    if(applicableMethods.empty)
+      raise "No applicable methods remain for " + aClass.to_s + ">>" + aSymbol.to_s
+    end
+    if self.applicableMethods.after?(aMethod) == nil
+      raise "The given method is not part of the active chain for " + aClass.to_s + ">>" + aSymbol.to_s
+    else 
+      return self.applicableMethods.after(aMethod)
+    end
   end
   
   def noResolutionPolicy()
-    #TODO
+    return raise "Behaviour adaptations are disallowed by policy"
   end
   
+  #to check
   def singleAdaptationResolutionPolicy()
-    #TODO
+    adaptation1 = ContextAdaptation.new
+    adaptation2 = ContextAdaptation.new
+    adaptation1.context = Context.default
+    
+    if(adaptation1.context == Context.default)
+      return false
+    end
+    if (adaptation2.context == Context.default)
+      return true
+    else 
+      myClass = adaptation1.adaptedClass
+      selector = adaptedSelector
+      return raise "Conflicting adaptations for " + myClass.to_s + ">>" + selector.to_s
+    end     
   end 
 end
