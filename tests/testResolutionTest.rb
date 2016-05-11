@@ -51,9 +51,6 @@ class TestContext < Test::Unit::TestCase
   
   #TEST 3 : Composition
   def testInterleavedActivation
-    @quietContext = Context.named("quiet")
-    @screeningContext = Context.named("screening")
-    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
        
     phone = Phone.new
     call = PhoneCall.new
@@ -76,9 +73,6 @@ class TestContext < Test::Unit::TestCase
   end
   
   def testNestedActivation
-    @quietContext = Context.named("quiet")
-    @screeningContext = Context.named("screening")
-    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
     
     phone = Phone.new
     call = PhoneCall.new
