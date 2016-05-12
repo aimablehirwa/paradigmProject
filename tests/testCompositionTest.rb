@@ -13,7 +13,9 @@ class TestContext < Test::Unit::TestCase
   
   #TEST 1 : Composition
   def testInvalidProceed
-    #TODO
+    phone = Phone.new
+    assert_raise(RuntimeError) {phone.class.proceed("advertise")}
+    #Proceed cannot be used in methods that are not adaptations of other methods
   end
 
   def testNestedActivation
@@ -24,7 +26,7 @@ class TestContext < Test::Unit::TestCase
     call = PhoneCall.new
     call.from= "Alice"
     phone.receive(call)
-    #puts "#{phone.class.advertise.call}"
+    
     assert(phone.class.advertise == "ringtone", "Call should be advertised with default ringtone")
   
     @screeningContext.activate

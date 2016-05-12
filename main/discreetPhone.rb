@@ -14,6 +14,7 @@ class DiscreetPhone < Phone
     def advertiseQuietly()
       return proc {"vibrator"}
     end
+    
   end
   
 end

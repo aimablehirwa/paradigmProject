@@ -10,6 +10,14 @@ class ScreeningPhone
     def advertiseWithScreening
       return proc {"#{self.proceed(__method__)} with screening"}
     end
+    def proceed(aSelector)
+      case aSelector
+      when :advertiseWithScreening
+        return "ringtone"
+      else
+        return "No advertisement method found."
+      end
+    end
     
   end
 end

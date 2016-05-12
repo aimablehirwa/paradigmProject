@@ -11,10 +11,10 @@ class Context
    ##################
    
    def initialize()
+     super
      @activationCount = 0 
      @adaptations = Set.new # use add to put an object
      @manager = nil
-     @adaptations = Set.new 
    end
    
    #############
@@ -22,26 +22,28 @@ class Context
    #############
    
    # getter du manager
-   def manager()
+   def manager
      # verifier si le manager est nil
      if @manager == nil
        # si le manager est nil alors verifier si self est le context par defaut
        if self == Context.default
          # si self est le context par defaut alors cree un nouveau manager
          # definir le nom de self aupres du manager comme etant le default
-         @manager = ContextManager.new
-         self.name= "default"
+         #@manager = ContextManager.new
+         self.manager = ContextManager.new
+         self.name = "default"
        else
          # si self n'est pas context par defaut
          # definir le manager comme etant le manager par defaut
-         @manager = Context.default.manager
+         #@manager = Context.default.manager
+         self.manager = Context.default.manager
        end
      end
      return @manager
    end
    
    # getter du manager
-   def name()
+   def name
      return self.manager.dictionary[self]
    end
    
@@ -54,7 +56,6 @@ class Context
        # si le nom n'est pas nil alors ajouter self au manager
        self.manager.dictionary[self] = aString 
      end 
-     return self
    end
    
    ##############
@@ -63,11 +64,13 @@ class Context
    
    # activation du context, incrementation du conteur d'activation + 1 pour le mettre actif
    def activate()
+     self.manager.signalActivationRequest(self)
+     
      if self.activationCount == 0
-       # on demande a active l'activer les adaptations du context
+       # on demande a activate d'activer les adaptations du context
        self.activateAdaptations
      end
-     self.activationCount= @activationCount + 1
+     self.activationCount = self.activationCount + 1
      return self
    end
    
@@ -76,11 +79,12 @@ class Context
    end
    
    def deactivate()
-     if @activationCount == 1
+     self.manager.signalDeactivationRequest(self)
+     if self.activationCount == 1
        self.deactivateAdaptations
      end
-     if @activationCount > 0
-       self.activationCount = @activationCount -1
+     if @activationCount != 0
+       @activationCount = @activationCount - 1
      end
      return self
    end
@@ -122,7 +126,7 @@ class Context
    def discard()
        self.manager.discardContext(self)
        if self == Context.default
-         Context.default= nil
+         Context.default = nil
        end
        copy = self.adaptations.clone
        copy.each do |adaptation | 
@@ -149,8 +153,14 @@ class Context
    
    def activateAdaptations
       self.adaptations.each do |adaptation|
-        self.manager.activateAdaptation(adaptation)
-        #TODO attraper l'exception et ...
+        #Catch error
+        begin 
+          self.manager.activateAdaptation(adaptation) 
+        rescue Exception => error    
+          raise error
+        ensure
+          self.rollbackAdaptations  
+        end      
       end
    end
    
@@ -187,6 +197,7 @@ class Context
      if existingAdaptation == nil
        existingAdaptation = aContextAdaptation
        self.addInexistentAdaptation(aContextAdaptation)
+       return self
      end
      
      action = aBlock.call
@@ -208,9 +219,10 @@ class Context
      if self.isActive
        self.manager.activateAdaptation(aContextAdaptation)
      end
-     if aContextAdaptation.adaptedImplementation != nil
+     
+     if aContextAdaptation.adaptedImplementation != nil 
        #TODO
-     end
+     end    
    end 
      
    def deactivateAdaptations
@@ -245,7 +257,7 @@ class Context
      #Removes all active adaptations corresponding to self. This set of adaptations 
      #might not necessarily be the same set stored in the 'adaptations' instance variable."
 
-     deployedAdaptations = self.manager.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.context == self } 
+     deployedAdaptations = self.manager.activeAdaptations.instance_eval{initialize_clone(self).keep_if{|adaptation| adaptation.context == self }} 
      deployedAdaptations.each do |adaptation| 
        self.manager.deactivateAdaptation(adaptation)
      end
@@ -270,7 +282,7 @@ class Context
    
      def named(aString)
        _ctx = self.new
-       _ctx.name= aString
+       _ctx.name = (aString)
        return _ctx
      end
      

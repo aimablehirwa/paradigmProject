@@ -8,6 +8,24 @@ class TestContext < Test::Unit::TestCase
   # The tests are automatically run #
   ###################################
   
+  #Private 
+  def resetDefaultContext
+    assert((defined?Context && Context.kind_of?(Class)) || (Context.method_defined?(:default) || Context.default(nil)))
+  end
+  
+  #Running
+  def setup
+    super 
+    #Start with a fresh default context
+    self.resetDefaultContext
+  end
+
+  def teardown
+    #Remove testing default context
+    self.resetDefaultContext
+    super
+  end
+  
   #TEST 0 : Protocol
   def testContextProtocol
     assert(defined?Context, "The Context should exist")
@@ -96,30 +114,16 @@ class TestContext < Test::Unit::TestCase
   end
   
   #TEST 5 : Life circle
-  def testContextDisposal
+  def testContextDisposal 
+    assert(Context.method_defined?(:name), "Method to drop unneeded contexts should exist")
     _previousDefault = Context.default
     assert(Context.default.isActive)
-    assert_raise(RuntimeError) {Context.default.discard}
-    
+    assert_raise(RuntimeError) {Context.default.discard}   
     Context.default.deactivate
     assert(!Context.default.isActive, "The default context should be inactive")
     assert_nothing_raised(RuntimeError){Context.default.discard}
     assert_nothing_raised(RuntimeError){self.testDefaultContext}
     assert(!(Context.default == _previousDefault), "Fresh default context should not be the default context just discarded")
   end
-  
-  #Private 
-  def resetDefaultContext
-    assert((defined?Context && Context.kind_of?(Class)) || (Context.method_defined?(:default) || Context.default == nil))
-  end
-  
-  #Running
-  def setup
-    Context.default= nil
-  end
-
-  def teardown
-    assert(resetDefaultContext)
-  end
-  
+   
 end

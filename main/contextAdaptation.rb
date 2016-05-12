@@ -78,7 +78,7 @@ class ContextAdaptation
   ###########
   
   def adaptsClass(aClass, aSymbol)
-    #TODO
+    return (self.adaptedClass == aClass) && (self.adaptedSelector == aSymbol) 
   end
   
   def sameTarget(aContextAdaptation)

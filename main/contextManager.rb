@@ -8,6 +8,7 @@ class ContextManager
   ##################
   
   def initialize()
+    super
     @dictionary = Hash.new(nil)
     @activeAdaptations = Set.new
     @resolutionPolicy = self.defaultResolutionPolicy
@@ -32,14 +33,14 @@ class ContextManager
     return @dictionary
   end
   
-  def resolutionPlolicy()
+  def resolutionPolicy
     return @resolutionPolicy
   end
   
   #to check
-  def resolutionPolicy(aBlock)
+  def resolutionPolicy=(aBlock)
     
-    resolutionPolicy = aBlock
+    @resolutionPolicy = aBlock
     adaptedTarget = Set.new
     
     @activeAdaptations.each do |adaptation| 
@@ -75,47 +76,47 @@ class ContextManager
   ##############
   
   def activateAdaptation(aContextAdaptation)
-    adapt = false
-    self.activeAdaptations.each do |adaptation| 
-      adapt = (adaptation.sameTarget(aContextAdaptation) && adaptation.context != Context.default)
-    end
-    #throw :cannotActiveAdaptation 
-    if adapt == true
-      raise "Conflicting adaptation for #{aContextAdaptation.adaptedClass.name} >> #{aContextAdaptation.adaptedSelector}"
-    end
-    
     self.activeAdaptations.add(aContextAdaptation)
-    aContextAdaptation.deploy
+    self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
+    
+    #adapt = false
+    #self.activeAdaptations.each do |adaptation| 
+     # adapt = (adaptation.sameTarget(aContextAdaptation) && adaptation.context != Context.default)
+    #end
+    #throw :cannotActiveAdaptation 
+    #if adapt == true
+     # raise "Conflicting adaptation for #{aContextAdaptation.adaptedClass.name} >> #{aContextAdaptation.adaptedSelector}"
+    #end
+    
+    #self.activeAdaptations.add(aContextAdaptation)
+    #aContextAdaptation.deploy
   end
   
   def adaptationChainForClass(aClass, aSymbol)
-    relevantAdaptations = self.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.adaptClass(aClass, aSymbol)}
-    if(relevantAdaptations.empty)
-      raise "No adaptations found for " + aClass.to_s + ">>" + aSymbol.to_s
-    end   
-    return relevantAdaptation.sorted(self.resolutionPlicy)
+    relevantAdaptations = self.activeAdaptations.instance_eval{initialize_clone(self).keep_if{|adaptation| adaptation.adaptsClass(aClass, aSymbol)}}
+    if(relevantAdaptations == nil)
+      raise "No adaptations found for #{aClass} >> #{aSymbol}"
+    end 
+    
+    if self.resolutionPolicy 
+      return relevantAdaptations.sort
+    end
   end
   
   def deactivateAdaptation(aContextAdaptation)
     if self.activeAdaptations.delete?(aContextAdaptation) == nil
       raise "Attempt to deactivate unmanaged adaptation."
     end
-
-    defaultAdaptation = nil
-    Context.default.adaptations.each do |adaptation| 
-      if adaptation.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
-        defaultAdaptation = adaptation
-      end
+    
+    if self.activeAdaptations != nil
+      self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
     end
-
-    if defaultAdaptation == nil
-      raise "Could not find default behaviour for removed adaptation."
-    end
-    defaultAdaptation.deploy
   end
   
   def deployBestAdaptationForClass(aClass, aSymbol)
-    self.adaptationChainForClass(aClass, aSymbol).first.deploy
+    if self.adaptationChainForClass(aClass, aSymbol) != nil
+      (self.adaptationChainForClass(aClass, aSymbol)).first.deploy
+    end
   end
   
   ##############
@@ -133,7 +134,8 @@ class ContextManager
       raise "Attempt to discard active context."
     end
     # si la cle n'est pas presente alors rien n'est fait
-    @dictionary.delete(aContext)
+    self.dictionary.delete(aContext)
+    @activationStamps.delete(aContext)
   end
   
   ############
@@ -182,6 +184,8 @@ class ContextManager
   end
   
   def noResolutionPolicy()
+    adaptation1 = ContextAdaptation.new
+    adaptation2 = ContextAdaptation.new
     return raise "Behaviour adaptations are disallowed by policy"
   end
   
