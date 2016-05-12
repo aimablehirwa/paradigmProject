@@ -22,7 +22,7 @@ class Context
    #############
    
    # getter du manager
-   def manager
+   def manager()
      # verifier si le manager est nil
      if @manager == nil
        # si le manager est nil alors verifier si self est le context par defaut
@@ -43,7 +43,7 @@ class Context
    end
    
    # getter du manager
-   def name
+   def name()
      return self.manager.dictionary[self]
    end
    
@@ -159,7 +159,7 @@ class Context
         rescue Exception => error    
           raise error
         ensure
-          self.rollbackAdaptations  
+          #self.rollbackAdaptations  
         end      
       end
    end
@@ -219,10 +219,9 @@ class Context
      if self.isActive
        self.manager.activateAdaptation(aContextAdaptation)
      end
-     
-     if aContextAdaptation.adaptedImplementation != nil 
+     if aContextAdaptation.adaptedImplementation != nil
        #TODO
-     end    
+     end
    end 
      
    def deactivateAdaptations
@@ -257,7 +256,7 @@ class Context
      #Removes all active adaptations corresponding to self. This set of adaptations 
      #might not necessarily be the same set stored in the 'adaptations' instance variable."
 
-     deployedAdaptations = self.manager.activeAdaptations.instance_eval{initialize_clone(self).keep_if{|adaptation| adaptation.context == self }} 
+     deployedAdaptations = self.manager.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.context == self } 
      deployedAdaptations.each do |adaptation| 
        self.manager.deactivateAdaptation(adaptation)
      end
@@ -282,7 +281,7 @@ class Context
    
      def named(aString)
        _ctx = self.new
-       _ctx.name = (aString)
+       _ctx.name= aString
        return _ctx
      end
      

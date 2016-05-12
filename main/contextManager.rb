@@ -1,5 +1,4 @@
 require "set"
-require_relative "contextAdaptation.rb"
 
 class ContextManager
   
@@ -33,11 +32,10 @@ class ContextManager
     return @dictionary
   end
   
-  def resolutionPolicy
+  def resolutionPlolicy()
     return @resolutionPolicy
   end
   
-  #to check
   def resolutionPolicy=(aBlock)
     
     @resolutionPolicy = aBlock
@@ -76,20 +74,21 @@ class ContextManager
   ##############
   
   def activateAdaptation(aContextAdaptation)
-    self.activeAdaptations.add(aContextAdaptation)
-    self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
-    
-    #adapt = false
-    #self.activeAdaptations.each do |adaptation| 
-     # adapt = (adaptation.sameTarget(aContextAdaptation) && adaptation.context != Context.default)
-    #end
-    #throw :cannotActiveAdaptation 
-    #if adapt == true
-     # raise "Conflicting adaptation for #{aContextAdaptation.adaptedClass.name} >> #{aContextAdaptation.adaptedSelector}"
-    #end
-    
     #self.activeAdaptations.add(aContextAdaptation)
-    #aContextAdaptation.deploy
+    #self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
+    
+    adapt = false
+    self.activeAdaptations.each do |adaptation| 
+      adapt = (adaptation.sameTarget(aContextAdaptation) && adaptation.context != Context.default)
+    end
+    #throw :cannotActiveAdaptation 
+    if adapt == true
+      raise "Conflicting adaptation for #{aContextAdaptation.adaptedClass.name} >> #{aContextAdaptation.adaptedSelector}"
+    end
+    
+    self.activeAdaptations.add(aContextAdaptation)
+    aContextAdaptation.deploy
+    #self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
   end
   
   def adaptationChainForClass(aClass, aSymbol)
@@ -107,10 +106,18 @@ class ContextManager
     if self.activeAdaptations.delete?(aContextAdaptation) == nil
       raise "Attempt to deactivate unmanaged adaptation."
     end
-    
-    if self.activeAdaptations != nil
-      self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
+
+    defaultAdaptation = nil
+    Context.default.adaptations.each do |adaptation| 
+      if adaptation.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
+        defaultAdaptation = adaptation
+      end
     end
+
+    if defaultAdaptation == nil
+      raise "Could not find default behaviour for removed adaptation."
+    end
+    defaultAdaptation.deploy
   end
   
   def deployBestAdaptationForClass(aClass, aSymbol)

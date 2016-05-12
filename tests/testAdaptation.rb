@@ -33,17 +33,14 @@ class TestContext < Test::Unit::TestCase
     phone = Phone.new
     call = PhoneCall.new 
     call.from = "Bob"
-    phone.receive(call)
-    puts phone.class.advertise 
+    phone.receive(call) 
     assert(phone.class.advertise == "ringtone", "A phone should play a ringtone by default")
     
     @quietContext.activate
-    puts phone.class.advertise.call
-    assert(phone.class.advertise.call == "vibrator", "The vibration behavior for quiet environments should be expressed")#to fix
+    assert(phone.class.advertise == "vibrator", "The vibration behavior for quiet environments should be expressed")#to fix
     
     @quietContext.deactivate
-    puts phone.class.advertise.call
-    assert(phone.class.advertise.call == "ringtone", "The default behaviour should be restored once the quiet context is deactivated")#to fix
+    assert(phone.class.advertise == "ringtone", "The default behaviour should be restored once the quiet context is deactivated")#to fix
     
   end
   

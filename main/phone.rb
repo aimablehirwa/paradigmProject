@@ -65,7 +65,7 @@ class Phone
   
   class << self
     def advertise
-      return proc {"#{self.proceed(__method__)}"}
+      return proc {"ringtone"}
     end
     
     def proceed(aSelector)
