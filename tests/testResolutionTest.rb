@@ -23,7 +23,7 @@ class TestContext < Test::Unit::TestCase
     @quietContext = Context.named("quiet")
     @offHookContext = Context.named("offhook")
     @quietContext.activate
-    assert_raise(RuntimeError, "Off-hook context should not cause a conflict with previous adaptations") {@offHookContext.activate}
+    assert_nothing_raised(RuntimeError, "Off-hook context should not cause a conflict with previous adaptations") {@offHookContext.activate}
     @offHookContext.deactivate
     @quietContext.deactivate
   end
@@ -67,25 +67,33 @@ class TestContext < Test::Unit::TestCase
     
     #The activation spans of screeningContext and quietContext are overlapped
     @quietContext.deactivate
-    #assert(phone.class.advertise == "ringtone with screening", "Screening information should be overlaid over default context behaviour (ringtone)")
+    assert(phone.class.advertise == "ringtone with screening", "Screening information should be overlaid over default context behaviour (ringtone)")
     @screeningContext.deactivate
     assert(phone.class.advertise == "ringtone", "Call advertisement should be reverted to the default")
   end
   
   def testNestedActivation
     
+    @quietContext = Context.named("quiet")
+    @screeningContext = Context.named("screening")
+    # "This adaptation definition is known to work from testAdaptationDefinition."
+    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
+    
     phone = Phone.new
     call = PhoneCall.new
     call.from = "Alice"
     phone.receive(call)
     
+    puts phone.class.advertise
     assert(phone.class.advertise == "ringtone", "Call should be advertised with default ringtone")
     
     @quietContext.activate
+    puts phone.class.advertise
     assert(phone.class.advertise == "vibrator", "Call advertisement should adapt to quiet context")
     
     @screeningContext.activate
-    assert(phone.class.advertise == "vibrator", "Screening information should be overlaid over quiet context behaviour (vibrator)")
+    puts phone.class.advertise
+    assert(phone.class.advertise == "vibrator with screening", "Screening information should be overlaid over quiet context behaviour (vibrator)")
     
     #The activation span of screeningContext is completely nested within that of quietContext
     @screeningContext.deactivate
