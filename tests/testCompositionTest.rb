@@ -1,8 +1,8 @@
 
-require "../main/context.rb"
-require "../main/phone.rb"
-require "../main/phoneCall.rb"
-require "../main/screeningPhone.rb"
+require "../COP/Context/context.rb"
+require "../COP/phone.rb"
+require "../COP/phoneCall.rb"
+require "../COP/screeningPhone.rb"
 require "test/unit"
 
 class TestContext < Test::Unit::TestCase
@@ -13,14 +13,14 @@ class TestContext < Test::Unit::TestCase
   
   #TEST 1 : Composition
   def testInvalidProceed
-    _context = Context.new
-    assert_raise(RuntimeError) {_context.proceed}
+    screening = ScreeningPhone.new
+    assert_raise(RuntimeError) {screening.class.proceed(__method__)}
     #Proceed cannot be used in methods that are not adaptations of other methods
   end
 
   def testNestedActivation
     @screeningContext = Context.named("screening")
-    @screeningContext.adaptClass(Phone, "advertise", ScreeningPhone.advertiseWithScreening) 
+    @screeningContext.adaptClass(Phone, "advertise", Phone.advertiseWithScreening) 
     
     phone = Phone.new
     call = PhoneCall.new
@@ -30,9 +30,10 @@ class TestContext < Test::Unit::TestCase
     assert(phone.class.advertise == "ringtone", "Call should be advertised with default ringtone")
   
     @screeningContext.activate
+    puts phone.class.advertise
     assert(phone.class.advertise == "ringtone with screening", "Screening information should be overlaid over the default ringtone advertisement")
     
-    @screeningContext.deactivate
+    @screeningContext.deactivate 
     assert(phone.class.advertise == "ringtone", "Call advertisement should have been reverted to default")
   end
   

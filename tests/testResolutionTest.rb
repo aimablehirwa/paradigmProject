@@ -1,9 +1,9 @@
-require "../main/context.rb"
-require "../main/phone.rb"
-require "../main/phoneCall.rb"
-require "../main/discreetPhone.rb"
-require "../main/multicallPhone.rb"
-require "../main/screeningPhone.rb"
+require "../COP/Context/context.rb"
+require "../COP/phone.rb"
+require "../COP/phoneCall.rb"
+require "../COP/discreetPhone.rb"
+require "../COP/multicallPhone.rb"
+require "../COP/screeningPhone.rb"
 require "test/unit"
 
 class TestContext < Test::Unit::TestCase

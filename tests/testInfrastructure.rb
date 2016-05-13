@@ -1,5 +1,5 @@
 
-require "../main/context.rb"
+require "../COP/Context/context.rb"
 require "test/unit"
 
 class TestContext < Test::Unit::TestCase

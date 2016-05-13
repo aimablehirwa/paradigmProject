@@ -13,7 +13,7 @@ class ScreeningPhone
     def proceed(aSelector)
       case aSelector
       when :advertiseWithScreening
-        return "ringtone"
+        advertiseWithScreening
       else
         return "No advertisement method found."
       end

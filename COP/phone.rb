@@ -64,14 +64,34 @@ class Phone
   #################
   
   class << self
+    #default
     def advertise
       return proc {"ringtone"}
+    end
+    #discreet
+    def advertiseDiscreteBeep()
+      return proc {"discrete beep"}
+    end
+    def advertiseQuietly()
+      return proc {"vibrator"}
+    end
+    #screening
+    def advertiseWithScreening
+      return proc {"#{self.proceed(__method__)} with screening"}
+    end
+    #multicall
+    def advertiseWaitingCall()
+      return proc {"call waiting signal"}
     end
     
     def proceed(aSelector)
       case aSelector
       when :advertise
-        return "ringtone"
+        "ringtone"
+      when :advertiseQuitly
+        "vibrator"
+      when :advertiseDiscreteBeep
+        "discrete beep"
       else
         return "No advertisement method found."
       end

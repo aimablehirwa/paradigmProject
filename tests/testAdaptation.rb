@@ -1,9 +1,9 @@
 
-require "../main/context.rb"
-require "../main/phone.rb"
-require "../main/phoneCall.rb"
-require "../main/discreetPhone.rb"
-require "../main/multicallPhone.rb"
+require '../COP/Context/context.rb'
+require "../COP/phone.rb"
+require "../COP/phoneCall.rb"
+require "../COP/discreetPhone.rb"
+require "../COP/multicallPhone.rb"
 require "test/unit"
 
 class TestContext < Test::Unit::TestCase
@@ -20,13 +20,13 @@ class TestContext < Test::Unit::TestCase
   #TEST 1 : Adaptation
   def testAdaptationDefinition
     @quietContext = Context.named("quiet")
-    assert_nothing_raised(RuntimeError) {@quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)}
+    assert_nothing_raised(RuntimeError) {@quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)}
   end
   
   def testOverridingAdaptation
     @quietContext = Context.named("quiet")
     # "This adaptation definition is known to work from testAdaptationDefinition."
-    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
+    @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
     
     # "The following tests plain behaviour adaptation to context.
     # The adaptation completely overrides the original behaviour."
