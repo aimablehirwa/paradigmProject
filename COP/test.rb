@@ -1,22 +1,16 @@
-require "../COP/context.rb"
+require "../COP/Context/context.rb"
 require "../COP/phone.rb"
 require "../COP/phoneCall.rb"
 
 
-@quietContext = Context.named("quiet")
-# "This adaptation definition is known to work from testAdaptationDefinition."
-@quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
-
-context = Context.new 
-context.name="jos"
+@screeningContext = Context.named("screening")
+#adaptedMethod = Phone.send("advertise".to_sym)
+@screeningContext.adaptClass(Phone, "advertise", Phone.advertiseWithScreening)
 
 phone = Phone.new
 call = PhoneCall.new 
-call.from = "Bob"
-phone.receive(call) 
-@quietContext.activate
-puts Phone.advertise 
-@quietContext.deactivate
-puts Phone.advertise 
+call.from = "Alice"
 
-puts Phone.advertiseQuietly.call
+puts phone.class.advertise
+@screeningContext.activate
+puts phone.class.advertise

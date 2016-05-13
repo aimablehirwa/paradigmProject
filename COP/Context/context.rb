@@ -1,16 +1,16 @@
 
 #$LOAD_PATH << '.' #to make Ruby aware that included files must be searched in the current directory.
 require "set"
-require_relative "../contextManager.rb"
-require_relative "../contextAdaptation.rb"
+require_relative "../ContextManager/contextManager.rb"
+require_relative "../ContextAdaptation/contextAdaptation.rb"
 
 #Import file
-require_relative "accessing.rb"
-require_relative "activation.rb"
-require_relative "adaptation.rb"
-require_relative "life_cycle.rb"
-require_relative "printing.rb"
-require_relative "private.rb"
+require_relative "modules/accessing.rb"
+require_relative "modules/activation.rb"
+require_relative "modules/adaptation.rb"
+require_relative "modules/life_cycle.rb"
+require_relative "modules/printing.rb"
+require_relative "modules/private.rb"
 
 #INCLUDE MODULES
 include Accessing

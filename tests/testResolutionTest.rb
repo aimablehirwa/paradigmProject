@@ -1,9 +1,6 @@
 require "../COP/Context/context.rb"
-require "../COP/phone.rb"
-require "../COP/phoneCall.rb"
-require "../COP/discreetPhone.rb"
-require "../COP/multicallPhone.rb"
-require "../COP/screeningPhone.rb"
+require "../COP/Phone/phone.rb"
+require "../COP/Phone/phoneCall.rb"
 require "test/unit"
 
 class TestContext < Test::Unit::TestCase
@@ -77,7 +74,7 @@ class TestContext < Test::Unit::TestCase
     @quietContext = Context.named("quiet")
     @screeningContext = Context.named("screening")
     # "This adaptation definition is known to work from testAdaptationDefinition."
-    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
+    @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
     
     phone = Phone.new
     call = PhoneCall.new
@@ -104,7 +101,7 @@ class TestContext < Test::Unit::TestCase
   
   #Running
   def setUp
-    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
-    @offHookContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
+    @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
+    @offHookContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
   end
 end

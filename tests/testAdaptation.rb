@@ -1,9 +1,7 @@
 
 require '../COP/Context/context.rb'
-require "../COP/phone.rb"
-require "../COP/phoneCall.rb"
-require "../COP/discreetPhone.rb"
-require "../COP/multicallPhone.rb"
+require "../COP/Phone/phone.rb"
+require "../COP/Phone/phoneCall.rb"
 require "test/unit"
 
 class TestContext < Test::Unit::TestCase
@@ -49,8 +47,8 @@ class TestContext < Test::Unit::TestCase
     #"This adaptation is known to work from previous tests."
     @quietContext = Context.named("quiet")
     @offHookContext = Context.named("offHook")
-    @quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)
-    assert_nothing_raised(RuntimeError){@offHookContext.adaptClass(Phone, "advertise", MulticallPhone.advertiseWaitingCall)}
+    @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
+    assert_nothing_raised(RuntimeError){@offHookContext.adaptClass(Phone, "advertise", Phone.advertiseWaitingCall)}
 
     assert(!@quietContext.isActive, "In normal conditions, the quiet context should be inactive")
     assert_nothing_raised(RuntimeError) {@quietContext.activate} 
@@ -67,15 +65,15 @@ class TestContext < Test::Unit::TestCase
   
   def testConflictingAdaptation
     @quietContext = Context.named("quiet")
-    assert_nothing_raised(RuntimeError){@quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseQuietly)} 
+    assert_nothing_raised(RuntimeError){@quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)} 
     #  description: 'Call advertisement behaviour should be adaptable to quiet environments';
-    assert_nothing_raised(RuntimeError) {@quietContext.adaptClass(Phone, "advertise", DiscreetPhone.advertiseDiscreteBeep)}
+    assert_nothing_raised(RuntimeError) {@quietContext.adaptClass(Phone, "advertise", Phone.advertiseDiscreteBeep)}
     #  description: 'A same context cannot have two different adaptations of the same method'.
   end
   
   def testInvalidAdaptation
     @quietContext = Context.named("quiet")
-    assert_raise(RuntimeError) {@quietContext.adaptClass(Phone, "phonyAdvertise", DiscreetPhone.advertiseQuietly).active}
+    assert_raise(RuntimeError) {@quietContext.adaptClass(Phone, "phonyAdvertise", Phone.advertiseQuietly).active}
     #  description: 'Adaptation of inexsistent methods should be forbidden'
   end
   
