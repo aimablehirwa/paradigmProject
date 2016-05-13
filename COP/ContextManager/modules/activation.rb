@@ -5,7 +5,12 @@ module Activation
   
   def contextActivationAge(aContext)
     #return 0 sinon
-    return @totalActivations - @activationStamps[aContext]  
+    temp = @activationStamps[aContext]
+    if temp == nil
+      return @totalActivations - 0
+    else
+      return @totalActivations - temp
+    end
   end
   
   #to check
@@ -17,4 +22,5 @@ module Activation
   def signalDeactivationRequest(aContext)
     #This callback is invoked whenever a context becomes inactive
   end
+  
 end

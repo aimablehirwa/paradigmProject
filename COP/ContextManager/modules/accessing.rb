@@ -9,7 +9,7 @@ module Accessing
   
   def activeContexts
     #Return set of active contexts
-    return self.activeAdaptations.select{|adaptation| adaptation.context}
+    return self.activeAdaptations.clone.keep_if{|adaptation| adaptation.context}
   end 
   
   def dictionary()

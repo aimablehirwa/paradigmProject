@@ -4,7 +4,7 @@ module Resolution
   ##############
   
   def ageResolutionPolicy()
-    return self.contextActivationAge(adaptation1.context) < self.contextActivationAge(adaptation2.context)
+    return proc {|adaptation1, adaptation2| self.contextActivationAge(adaptation1.context) <=> self.contextActivationAge(adaptation2.context)}
   end 
   
   def defaultResolutionPolicy()
@@ -12,38 +12,44 @@ module Resolution
   end
   
   def findNextMethodForClass(aClass, aSymbol, aMethod)
-    applicableMethods = self.adaptationChainForClass(aClass, aSymbol).initialize_clone.keep_if{|adaptation| adaptation.adaptedImplementation}
-    if(applicableMethods.empty)
+    clone = self.adaptationChainForClass(aClass, aSymbol).clone
+    applicableMethods = clone.keep_if{|adaptation| adaptation.adaptedImplementation}
+    if(applicableMethods.empty?)
       raise "No applicable methods remain for " + aClass.to_s + ">>" + aSymbol.to_s
     end
-    if self.applicableMethods.after?(aMethod) == nil
+    array = applicableMethods.to_a
+    
+    ind = array.index(aMethod)
+    if  array(ind+1) == nil
       raise "The given method is not part of the active chain for " + aClass.to_s + ">>" + aSymbol.to_s
     else 
-      return self.applicableMethods.after(aMethod)
+      return array(ind+1)
     end
+    #TODO a supprimer
   end
   
-  def noResolutionPolicy()
-    adaptation1 = ContextAdaptation.new
-    adaptation2 = ContextAdaptation.new
-    return raise "Behaviour adaptations are disallowed by policy"
-  end
+  #def noResolutionPolicy()
+  #  adaptation1 = ContextAdaptation.new
+  #  adaptation2 = ContextAdaptation.new
+  #  return raise "Behaviour adaptations are disallowed by policy"
+  #end
   
   #to check
   def singleAdaptationResolutionPolicy()
-    adaptation1 = ContextAdaptation.new
-    adaptation2 = ContextAdaptation.new
-    adaptation1.context = Context.default
-    
-    if(adaptation1.context == Context.default)
-      return false
-    end
-    if (adaptation2.context == Context.default)
-      return true
-    else 
-      myClass = adaptation1.adaptedClass
-      selector = adaptedSelector
-      return raise "Conflicting adaptations for " + myClass.to_s + ">>" + selector.to_s
-    end     
-  end 
+    proc {|adaptation1, adaptation2|
+      if(adaptation1.context == Context.default)
+         #proc {false}
+         1
+      else
+        if (adaptation2.context == Context.default)
+           #proc {true}
+           -1
+        else 
+           #raise "Conflicting adaptations for " + adaptation1.adaptedClass.to_s + ">>" + adaptation2.adaptedSelector.to_s
+           0
+        end     
+      end
+    }    
+  end
+   
 end

@@ -59,7 +59,32 @@ class Context
        _ctx = self.new
        _ctx.name= aString
        return _ctx
-     end  
+     end 
+     
+     def activeAdaptations
+       if @activeAdaptations == nil
+          @activeAdaptations = Set.new
+       end
+       return @activeAdaptations
+     end
+     
+     # methode pour recuperer l'adapter precedent, doit etre utiliser pour COP Composition
+     # attention ne marche pas
+     def proceed(aClass, currentMethod) 
+       currentadaptation = nil
+       @activeAdaptations.each do |adaptation|#currentMethod properties at: #adaptation
+         if (adaptation.adaptedClass.name == aClass.name) && (adaptation.adaptedSelector.to_s == currentMethod.to_s)
+           currentadaptation = adaptation 
+         end
+       end
+       if currentadaptation == nil
+          raise "Proceed can only be used in adapted methods"
+       end
+        
+       nextMethod = currentadaptation.context.manager.findNextMethodForClass(currentadaptation.adaptedClass, currentadaptation.adaptedSelector, currentMethod)
+       return nextMethod
+     end
+      
    end
    
    ###########
@@ -71,6 +96,7 @@ class Context
         #Catch error
         begin 
           self.manager.activateAdaptation(adaptation) 
+          Context.activeAdaptations.add(adaptation)
         rescue Exception => error    
           raise error
         ensure
@@ -134,9 +160,6 @@ class Context
      if self.isActive
        self.manager.activateAdaptation(aContextAdaptation)
      end
-     if aContextAdaptation.adaptedImplementation != nil
-       #TODO
-     end
    end 
      
    def deactivateAdaptations
@@ -160,19 +183,16 @@ class Context
      if self.adaptations.delete?(aContextAdaptation) == nil 
        raise "Inconsistent context state."
      end
-     aBlock = proc {}
-     if aContextAdaptation.adaptedImplementation != nil
-       #TODO
-     end
    end
      
    def rollbackAdaptations
      #Removes all active adaptations corresponding to self. This set of adaptations 
      #might not necessarily be the same set stored in the 'adaptations' instance variable."
 
-     deployedAdaptations = self.manager.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.context == self } 
+     deployedAdaptations =  self.manager.activeAdaptations.clone.keep_if{|adaptation| adaptation.context == self } 
      deployedAdaptations.each do |adaptation| 
        self.manager.deactivateAdaptation(adaptation)
+       Context.activeAdaptations.delete(adaptation)
      end
    end
    

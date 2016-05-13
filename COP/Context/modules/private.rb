@@ -8,6 +8,7 @@ module Private
         #Catch error
         begin 
           self.manager.activateAdaptation(adaptation) 
+          Context.activeAdaptations.add(adaptation)
         rescue Exception => error    
           raise error
         ensure
@@ -72,14 +73,12 @@ module Private
      if self.isActive
        self.manager.activateAdaptation(aContextAdaptation)
      end
-     if aContextAdaptation.adaptedImplementation != nil
-       #TODO
-     end
    end 
      
    def deactivateAdaptations
      self.adaptations.each do |adaptation|
        self.manager.deactivateAdaptation(adaptation)
+       Context.activeAdaptations.delete(adaptation)
      end
    end
    
@@ -94,14 +93,12 @@ module Private
      end
      if self.isActive
        self.manager.deactivateAdaptation(aContextAdaptation)
+       Context.activeAdaptations.delete(adaptation)
      end
      if self.adaptations.delete?(aContextAdaptation) == nil 
        raise "Inconsistent context state."
      end
-     aBlock = proc {}
-     if aContextAdaptation.adaptedImplementation != nil
-       #TODO
-     end
+
    end
    
    
@@ -109,9 +106,10 @@ module Private
      #Removes all active adaptations corresponding to self. This set of adaptations 
      #might not necessarily be the same set stored in the 'adaptations' instance variable."
 
-     deployedAdaptations = self.manager.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.context == self } 
+     deployedAdaptations = self.manager.activeAdaptations.clone.keep_if{|adaptation| adaptation.context == self} 
      deployedAdaptations.each do |adaptation| 
        self.manager.deactivateAdaptation(adaptation)
+       Context.activeAdaptations.delete(adaptation)
      end
    end
 end
