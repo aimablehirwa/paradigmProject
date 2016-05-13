@@ -10,7 +10,7 @@ require_relative "modules/activation.rb"
 require_relative "modules/adaptation.rb"
 require_relative "modules/life_cycle.rb"
 require_relative "modules/printing.rb"
-require_relative "modules/private.rb"
+
 
 
 class Context
@@ -21,7 +21,6 @@ class Context
    include Adaptation
    include Life_cycle
    include Printing
-   include Private
    
    ##################
    # Initialization #
@@ -61,6 +60,120 @@ class Context
        _ctx.name= aString
        return _ctx
      end  
+   end
+   
+   ###########
+   # Private #
+   ###########
+   
+   def activateAdaptations
+      self.adaptations.each do |adaptation|
+        #Catch error
+        begin 
+          self.manager.activateAdaptation(adaptation) 
+        rescue Exception => error    
+          raise error
+        ensure
+          #self.rollbackAdaptations  
+        end      
+      end
+   end
+   
+   def activationCount()
+     return @activationCount
+   end
+   
+   def activationCount=(anInteger)
+     @activationCount = anInteger
+   end
+   
+   def adaptations
+     @adaptations
+   end
+   
+   def adaptations=(set)
+     @adaptations = set  
+   end
+   
+   
+   def addAdaptation(aContextAdaptation)
+     ifOverridding = proc {"overwrite"}
+     self.addAdaptationOverrid(aContextAdaptation, ifOverridding)
+   end
+      
+   def addAdaptationOverrid(aContextAdaptation, aBlock)
+     existingAdaptation = nil
+     self.adaptations.each do |adaptation| 
+       # le meme context ne peut pas avoir deux adaptations differentes du meme selector
+       if adaptation.sameTarget(aContextAdaptation)
+         existingAdaptation = adaptation
+       end
+     end
+     if existingAdaptation == nil
+       existingAdaptation = aContextAdaptation
+       self.addInexistentAdaptation(aContextAdaptation)
+       return self
+     end
+     
+     action = aBlock.call
+     if action != "preserve"
+       if action == "overwrite"
+         self.removeExistingAdaptation(existingAdaptation)
+         self.addInexistentAdaptation(aContextAdaptation)
+       else
+         raise "Unknown overridding action  #{action}."
+       end
+     end
+   end  
+   
+   def addInexistentAdaptation(aContextAdaptation)
+     if self != aContextAdaptation.context
+       raise "Attempt to add foreign adaptation."
+     end
+     self.adaptations.add(aContextAdaptation)
+     if self.isActive
+       self.manager.activateAdaptation(aContextAdaptation)
+     end
+     if aContextAdaptation.adaptedImplementation != nil
+       #TODO
+     end
+   end 
+     
+   def deactivateAdaptations
+     self.adaptations.each do |adaptation|
+       self.manager.deactivateAdaptation(adaptation)
+     end
+   end
+   
+   # setter du manager
+   def manager=(aContextManager)
+     @manager = aContextManager
+   end
+   
+   def removeExistingAdaptation(aContextAdaptation)
+     if self != aContextAdaptation.context 
+       raise "Request to remove foreign adaptation."
+     end
+     if self.isActive
+       self.manager.deactivateAdaptation(aContextAdaptation)
+     end
+     if self.adaptations.delete?(aContextAdaptation) == nil 
+       raise "Inconsistent context state."
+     end
+     aBlock = proc {}
+     if aContextAdaptation.adaptedImplementation != nil
+       #TODO
+     end
+   end
+     
+   def rollbackAdaptations
+     #Removes all active adaptations corresponding to self. This set of adaptations 
+     #might not necessarily be the same set stored in the 'adaptations' instance variable."
+
+     deployedAdaptations = self.manager.activeAdaptations.initialize_clone.keep_if{|adaptation| adaptation.context == self } 
+     deployedAdaptations.each do |adaptation| 
+       self.manager.deactivateAdaptation(adaptation)
+     end
    end
    
 end
