@@ -19,7 +19,7 @@ class PhoneCall
   ############
   
   def printOn(aStream)
-    #TODO
+    puts "#{self.from}"
   end
   
 end
