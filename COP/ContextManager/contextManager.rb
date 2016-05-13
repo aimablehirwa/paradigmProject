@@ -8,16 +8,16 @@ require_relative "modules/life_cycle.rb"
 require_relative "modules/printing.rb"
 require_relative "modules/resolution.rb"
 
-#INCLUDE MODULES
-include Accessing
-include Activation
-include Adaptation
-include Life_cycle
-include Printing
-include Resolution
-
 
 class ContextManager
+  
+  #INCLUDE MODULES
+  include Accessing
+  include Activation
+  include Adaptation
+  include Life_cycle
+  include Printing
+  include Resolution
   
   ##################
   # Initialization #
@@ -35,11 +35,11 @@ class ContextManager
   ###########
   # Private #
   ###########
-  
+  private
   def activeAdaptations=(aCollection)
     @activeAdaptations = aCollection
   end
-  
+  private
   def dictionary=(aDictionary)
     @dictionary = aDictionary
   end

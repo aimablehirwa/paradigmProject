@@ -6,12 +6,12 @@ require_relative "modules/accessing.rb"
 require_relative "modules/call_handling.rb"
 require_relative "modules/call_handling_shortcuts.rb"
 
-#INCLUDE MODULES
-include Accessing
-include Call_handling
-include Call_handling_shortcuts
-
 class Phone
+  
+  #INCLUDE MODULES
+  include Accessing
+  include Call_handling
+  include Call_handling_shortcuts
   
   ##################
   # Initialization #

@@ -12,17 +12,17 @@ require_relative "modules/life_cycle.rb"
 require_relative "modules/printing.rb"
 require_relative "modules/private.rb"
 
-#INCLUDE MODULES
-include Accessing
-include Activation
-include Adaptation
-include Life_cycle
-include Printing
-include Private
-
 
 class Context
-      
+   
+   #INCLUDE MODULES
+   include Accessing
+   include Activation
+   include Adaptation
+   include Life_cycle
+   include Printing
+   include Private
+   
    ##################
    # Initialization #
    ##################

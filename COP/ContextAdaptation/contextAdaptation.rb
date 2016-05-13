@@ -7,13 +7,13 @@ require_relative "modules/installation.rb"
 require_relative "modules/printing.rb"
 require_relative "modules/testing.rb"
 
-#INCLUDE MODULES
-include Accessing
-include Installation
-include Printing
-include Testing
-
 class ContextAdaptation
+  
+  #INCLUDE MODULES
+  include Accessing
+  include Installation
+  include Printing
+  include Testing
   
   ##################
   # Initialization #
