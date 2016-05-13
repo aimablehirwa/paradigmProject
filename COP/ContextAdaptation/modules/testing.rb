@@ -11,10 +11,4 @@ module Testing
     return self.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
   end
   
-  def equals(aContextAdaptation)
-    return ((self.context == aContextAdaptation.context) && 
-      (self.adaptedClass == aContextAdaptation.adaptedClass) && 
-      (self.adaptedSelector == aContextAdaptation.adaptedSelector)  && 
-      (self.adaptedImplementation == aContextAdaptation.adaptedImplementation)) 
-  end
 end
