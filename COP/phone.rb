@@ -92,6 +92,8 @@ class Phone
         "vibrator"
       when :advertiseDiscreteBeep
         "discrete beep"
+      when :advertiWaitingCall
+        "call waiting signal"
       else
         return "No advertisement method found."
       end
