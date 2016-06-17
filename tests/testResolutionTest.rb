@@ -48,7 +48,11 @@ class TestContext < Test::Unit::TestCase
   
   #TEST 3 : Composition
   def testInterleavedActivation
-       
+    @quietContext = Context.named("quiet")
+    @screeningContext = Context.named("screening")
+    @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
+    @screeningContext.adaptClass(Phone, "advertise", Phone.advertiseWithScreening) 
+    
     phone = Phone.new
     call = PhoneCall.new
     call.from = "Alice"
@@ -60,7 +64,7 @@ class TestContext < Test::Unit::TestCase
     assert(phone.class.advertise == "vibrator", "Call advertisement should adapt to quiet context")
     
     @screeningContext.activate
-    assert(phone.class.advertise == "vibrator", "Screening information should be overlaid over quiet context behaviour (vibrator)")
+    assert(phone.class.advertise == "vibrator with screening", "Screening information should be overlaid over quiet context behaviour (vibrator)")
     
     #The activation spans of screeningContext and quietContext are overlapped
     @quietContext.deactivate
@@ -75,21 +79,19 @@ class TestContext < Test::Unit::TestCase
     @screeningContext = Context.named("screening")
     # "This adaptation definition is known to work from testAdaptationDefinition."
     @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
+    @screeningContext.adaptClass(Phone, "advertise", Phone.advertiseWithScreening)
     
     phone = Phone.new
     call = PhoneCall.new
     call.from = "Alice"
     phone.receive(call)
     
-    puts phone.class.advertise
     assert(phone.class.advertise == "ringtone", "Call should be advertised with default ringtone")
     
     @quietContext.activate
-    puts phone.class.advertise
     assert(phone.class.advertise == "vibrator", "Call advertisement should adapt to quiet context")
     
     @screeningContext.activate
-    puts phone.class.advertise
     assert(phone.class.advertise == "vibrator with screening", "Screening information should be overlaid over quiet context behaviour (vibrator)")
     
     #The activation span of screeningContext is completely nested within that of quietContext
@@ -101,7 +103,7 @@ class TestContext < Test::Unit::TestCase
   
   #Running
   def setUp
-    @quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
-    @offHookContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
+    #@quietContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
+    #@offHookContext.adaptClass(Phone, "advertise", Phone.advertiseQuietly)
   end
 end

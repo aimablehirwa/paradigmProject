@@ -15,4 +15,5 @@ module Life_cycle
          self.removeExistingAdaptation(adaptation)
        end
    end
+   
 end

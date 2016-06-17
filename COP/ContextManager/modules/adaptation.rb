@@ -17,13 +17,16 @@ module Adaptation
     #  raise "Conflicting adaptation for #{aContextAdaptation.adaptedClass.name} >> #{aContextAdaptation.adaptedSelector}"
     #end
     self.activeAdaptations.add(aContextAdaptation)
+    ContextManager.singletonActiveAdaptations.add(aContextAdaptation)
     deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
     #aContextAdaptation.deploy
     #self.deployBestAdaptationForClass(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)
   end
   
   def adaptationChainForClass(aClass, aSymbol)
-    relevantAdaptations = self.activeAdaptations.clone.keep_if{|adaptation| adaptation.adaptsClass(aClass, aSymbol)}
+    relevantAdaptations = self.activeAdaptations.clone.keep_if{|adaptation|(adaptation.adaptedClass.name == aClass.name) && (adaptation.adaptedSelector.to_s == aSymbol.to_s)}
+    
+    #relevantAdaptations = self.activeAdaptations.clone.keep_if{|adaptation| adaptation.adaptsClass(aClass, aSymbol)}
     if(relevantAdaptations == [])
       raise "No adaptations found for #{aClass} >> #{aSymbol}"
     end 
@@ -36,7 +39,7 @@ module Adaptation
     if self.activeAdaptations.delete?(aContextAdaptation) == nil
       raise "Attempt to deactivate unmanaged adaptation."
     end
-
+    ContextManager.singletonActiveAdaptations.delete?(aContextAdaptation)
     #defaultAdaptation = nil
     #Context.default.adaptations.each do |adaptation| 
     #  if adaptation.isClassAndSelector(aContextAdaptation.adaptedClass, aContextAdaptation.adaptedSelector)

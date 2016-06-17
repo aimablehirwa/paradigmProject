@@ -29,7 +29,6 @@ class TestContext < Test::Unit::TestCase
     assert(phone.class.advertise == "ringtone", "Call should be advertised with default ringtone")
   
     @screeningContext.activate
-    puts phone.class.advertise
     assert(phone.class.advertise == "ringtone with screening", "Screening information should be overlaid over the default ringtone advertisement")
     
     @screeningContext.deactivate 

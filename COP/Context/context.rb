@@ -67,23 +67,6 @@ class Context
        end
        return @activeAdaptations
      end
-     
-     # methode pour recuperer l'adapter precedent, doit etre utiliser pour COP Composition
-     # attention ne marche pas
-     def proceed(aClass, currentMethod) 
-       currentadaptation = nil
-       @activeAdaptations.each do |adaptation|#currentMethod properties at: #adaptation
-         if (adaptation.adaptedClass.name == aClass.name) && (adaptation.adaptedSelector.to_s == currentMethod.to_s)
-           currentadaptation = adaptation 
-         end
-       end
-       if currentadaptation == nil
-          raise "Proceed can only be used in adapted methods"
-       end
-        
-       nextMethod = currentadaptation.context.manager.findNextMethodForClass(currentadaptation.adaptedClass, currentadaptation.adaptedSelector, currentMethod)
-       return nextMethod
-     end
       
    end
    

@@ -43,4 +43,40 @@ class ContextManager
   def dictionary=(aDictionary)
     @dictionary = aDictionary
   end
+  
+  class << self
+  
+    #@singletonActiveAdaptations = Set.new
+  
+    def singletonActiveAdaptations
+     if @singletonActiveAdaptations == nil
+        @singletonActiveAdaptations = Set.new
+     end
+       return @singletonActiveAdaptations
+    end
+  
+    def singletonActiveAdaptations=(aCollection)
+       @singletonActiveAdaptations = aCollection
+    end
+  
+    # recuperation de la methode de l'adapter precedent l'adapter courrant
+    def proceed(aClass, aSymbol, aMethod) 
+      
+       currentadaptation = nil #@activeAdaptations[aClass.send(aMethod)]
+     
+       @singletonActiveAdaptations.each do |adaptation|#currentMethod properties at: #adaptation
+         if (adaptation.adaptedClass.name == aClass.name) && (adaptation.adaptedSelector.to_s == aSymbol.to_s)
+           currentadaptation = adaptation 
+         end
+       end
+
+       if currentadaptation == nil
+          raise "Proceed can only be used in adapted methods"
+       end
+
+       nextMethod = currentadaptation.context.manager.findNextMethodForClass(aClass, aSymbol, aMethod)
+      return nextMethod.call
+    end
+  end
+  
 end

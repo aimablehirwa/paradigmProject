@@ -12,22 +12,20 @@ module Resolution
   end
   
   def findNextMethodForClass(aClass, aSymbol, aMethod)
+
     clone = self.adaptationChainForClass(aClass, aSymbol).clone
+
     applicableMethods = clone.keep_if{|adaptation| adaptation.adaptedImplementation}
+
     if(applicableMethods.empty?)
       raise "No applicable methods remain for " + aClass.to_s + ">>" + aSymbol.to_s
     end
+
     array = applicableMethods.to_a
     
-    ind = array.index(aMethod)
-    if  array(ind+1) == nil
-      raise "The given method is not part of the active chain for " + aClass.to_s + ">>" + aSymbol.to_s
-    else 
-      return array(ind+1)
-    end
-    #TODO a supprimer
+    return (array[1]).adaptedImplementation
+
   end
-  
   #def noResolutionPolicy()
   #  adaptation1 = ContextAdaptation.new
   #  adaptation2 = ContextAdaptation.new

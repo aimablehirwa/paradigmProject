@@ -41,7 +41,8 @@ class Phone
     end
     #screening
     def advertiseWithScreening
-      return proc {"#{self.proceed(__method__)} with screening"}
+      #return proc {"#{self.proceed(__method__)} with screening"}
+      return proc {"#{ContextManager.proceed(self, __method__, Phone.advertiseWithScreening)} with screening"}
     end
     #multicall
     def advertiseWaitingCall()
