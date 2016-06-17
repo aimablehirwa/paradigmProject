@@ -146,8 +146,10 @@ class Context
    end 
      
    def deactivateAdaptations
-     self.adaptations.each do |adaptation|
-       self.manager.deactivateAdaptation(adaptation)
+     if self != Context.default
+       self.adaptations.each do |adaptation|
+         self.manager.deactivateAdaptation(adaptation)
+       end
      end
    end
    
@@ -160,7 +162,7 @@ class Context
      if self != aContextAdaptation.context 
        raise "Request to remove foreign adaptation."
      end
-     if self.isActive
+     if self.isActive && self != Context.default 
        self.manager.deactivateAdaptation(aContextAdaptation)
      end
      if self.adaptations.delete?(aContextAdaptation) == nil 
